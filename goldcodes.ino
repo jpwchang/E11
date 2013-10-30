@@ -22,9 +22,11 @@ boolean Seeds2[NUMCODES][SEEDLEN] = {{0,0,0,0,1},
 //Creates 2 variables, one for the current state of each LFSR
 boolean regState1[SEEDLEN] = {0,0,0,0,0};
 boolean regState2[SEEDLEN] = {0,0,0,0,0};
+boolean goldCodes[NUMCODES][GCLEN];
 
 void flashGC()
 {
+  
 }
 
 
@@ -115,3 +117,83 @@ String strGC(boolean *gc)
   return result;
 }
 
+void generateGoldCodes()
+{
+  //Cycles through each code to be generated
+  for (int i = 0; i < NUMCODES; i++)
+  {
+    //Sets he regist states to the initial values
+    seedRegisters(i);
+    //Goes through GCLEN times
+    for (int j = 0; j < GCLEN; j++)
+    {
+      //Stores the XOR of the two outputs
+      goldCodes[i][j] = xOr(regState1[SEEDLEN - 1], regState2[SEEDLEN - 1]);
+      //Gets the next states
+      getNextState();
+    }
+  }
+}
+
+int correlate(boolean *gc1, boolean *gc2)
+{
+  //Correlation starts at 0
+  int correlation = 0;
+  //goes through each element of the array
+  for (int i = 0; i < GCLEN; i++)
+  {
+    if (gc1[i] == gc2[i])//If the match it icremements
+    {
+      correlation ++;
+    }
+    else//Otherwise decrements
+    {
+      correlation --;
+    }
+  }
+  return correlation;
+}
+
+boolean corGoldCodes(boolean *gc1, boolean *gc2)
+{
+  // Sets the maximum cor to -31 (min possible)
+  int maximum = -31;
+  boolean gc3[GCLEN];
+  boolean last;
+  for (int i = 0; i < GCLEN; i++)
+  {
+    gc3[i] = gc2[i];
+  }
+  
+  //For every shift amount
+  for (int m = 0; m < GCLEN; m++)
+  {
+    Serial.println(strGC(gc1));
+    Serial.println(strGC(gc3));
+    //Correlate
+    int correlation = correlate(gc1,gc3);
+    //Replace maximum if necessary
+    if (correlation > maximum)
+    {
+      maximum = correlation;
+    }
+    //Shifts for nxt cycle
+    last = gc3[GCLEN-1];
+    for (int i = GCLEN-1; i > 0; i--)
+    {
+      gc3[i] = gc3[i-1];
+    }
+    gc3[0] = last;
+  }
+  return (maximum > 23);
+}        
+
+void shiftGC()
+{
+  boolean wrap = GC[GCLEN - 1];
+  for (int i = GCLEN - 1; i > 0; i--)
+  {
+    GC[i] = GC[i - 1];
+  }
+  GC[0] = wrap;
+}
