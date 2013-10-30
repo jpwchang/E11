@@ -22,7 +22,7 @@ boolean Seeds2[NUMCODES][SEEDLEN] = {{0,0,0,0,1},
 //Creates 2 variables, one for the current state of each LFSR
 boolean regState1[SEEDLEN] = {0,0,0,0,0};
 boolean regState2[SEEDLEN] = {0,0,0,0,0};
-boolean goldCodes[NUMCODES][GCLEN];
+//boolean goldCodes[NUMCODES][GCLEN];
 
 void flashGC()
 {
