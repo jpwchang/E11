@@ -154,10 +154,12 @@ int correlate(boolean *gc1, boolean *gc2)
   return correlation;
 }
 
-boolean corGoldCodes(boolean *gc1, boolean *gc2)
+//return 1 if positive correlation, -1 if negative correlation,
+//0 otherwise
+int corGoldCodes(boolean *gc1, boolean *gc2)
 {
   // Sets the maximum cor to -31 (min possible)
-  int maximum = -31;
+  int maximum = 0;
   boolean gc3[GCLEN];
   boolean last;
   for (int i = 0; i < GCLEN; i++)
@@ -168,12 +170,14 @@ boolean corGoldCodes(boolean *gc1, boolean *gc2)
   //For every shift amount
   for (int m = 0; m < GCLEN; m++)
   {
-    Serial.println(strGC(gc1));
-    Serial.println(strGC(gc3));
+    //Serial.println(strGC(gc1));
+    //Serial.println(strGC(gc3));
     //Correlate
     int correlation = correlate(gc1,gc3);
+    int sign = correlation / abs(correlation);
+    //Serial.println(correlation);
     //Replace maximum if necessary
-    if (correlation > maximum)
+    if (abs(correlation) > abs(maximum))
     {
       maximum = correlation;
     }
@@ -185,7 +189,8 @@ boolean corGoldCodes(boolean *gc1, boolean *gc2)
     }
     gc3[0] = last;
   }
-  return (maximum > 23);
+  Serial.println(maximum);
+  return maximum;
 }        
 
 void shiftGC()
