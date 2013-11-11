@@ -9,6 +9,7 @@
 #define REFLECT 18
 #define PHOTOT 19
 #define TOUCH 2
+#define TEAM 3
 
 #define NOLIGHT 800 //Light threshold (may have to change)
 
@@ -19,6 +20,7 @@ void initSensors()
   pinMode(REFLECT, INPUT);
   pinMode(PHOTOT, INPUT);
   pinMode(TOUCH, INPUT);
+  pinMode(TEAM, INPUT);
 }
 
 //Get the value of the reflectance sensor
@@ -43,4 +45,9 @@ int getLight()
 int getTouch()
 {
   return digitalRead(TOUCH);
+}
+
+int getTeam()
+{
+  return digitalRead(TEAM);
 }
