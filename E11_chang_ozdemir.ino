@@ -3,7 +3,7 @@
 #define NOLIGHT 750
 #define SEEDLEN 5
 #define GRAY 800
-#define BLACK 950
+#define BLACK 915
 
 typedef enum {
   NONE,
@@ -38,8 +38,8 @@ team myTeam = NONE;
 int prevReflect = 0;
 int oppSeen = 0;
 
-boolean off = true;
-int startOn = 0;
+boolean on = true;
+int startOff = 0;
 
 void setup()
 {
@@ -62,6 +62,8 @@ void loop()
       drive(255,255);
     else
     {
+      drive(-255,255);
+      delay(100);
       nav_state++;
     }
     prevReflect = r;
@@ -69,28 +71,31 @@ void loop()
   }
   case 1:
   {
-    int reading = getReflect();
-    if(oppSeen < 2000)
+    int reading = 0;
+    for(int i = 0; i < 20; i++)
+      reading += getReflect();
+    reading /= 20;
+    if(oppSeen < 350)
     {
-      if(reading < GRAY)
+      if(reading < GRAY || reading > BLACK)
       {
-        if(!off) off = true;
-        drive(200, 0);
-      }
-      else
-      {
-        int lpow = 100;
-        if(off)
+        int rpow = 100;
+        if(on)
         {
-          off = false;
-          startOn = millis();
+          on = false;
+          startOff = millis();
         }
         else
         {
-          if(millis()-startOn > 100)
-            lpow=0;
+          if(millis()-startOff > 100)
+            rpow = 0;
         }
-        drive(lpow, 200);
+        drive(255, rpow);
+      }
+      else
+      {
+        if(!on) on=true;
+        drive(150,255);
       }
       
       if(detectedTeam != NONE && detectedTeam != myTeam)
@@ -107,7 +112,7 @@ void loop()
   {
     detectedTeam = NONE;
     drive(0,-150);
-    delay(1400);
+    delay(600);
     nav_state++;
     break;
   }
@@ -122,9 +127,9 @@ void loop()
   case 4:
   {
     drive(-255,-255);
-    delay(500);
+    delay(250);
     drive(-255,255);
-    delay(500);
+    delay(250);
     nav_state = 1;
     detectedTeam = NONE;
     break;
